@@ -3,7 +3,7 @@ jobs:
   - job: APITestAndBuild
     displayName: API test and build
     variables:
-      IMAGE_NAME: demo-api
+      IMAGE_NAME: nick96/demo-api
     pool:
       vmImage: "ubuntu-16.04"
     steps:
@@ -23,6 +23,7 @@ jobs:
         inputs:
           command: push
           containerRegistry: nick96-docker-hub
+          repository: $(IMAGE_NAME)
           tags: $(Build.SourceVersion)
 
   - job: FrontendTestAndBuild
