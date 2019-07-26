@@ -45,8 +45,20 @@ jobs:
         ArtifactName: frontend
         PathtoPublish: frontend/build
 
-  - deployment: Deploy
-    displayName: Deploy API and Frontend
+  - deployment: DeployAPI
+    displayName: Deploy API
+    environment: api-deploy
+    pool:
+      vmImage: "ubuntu-16.04"
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: echo 'Hello, World!'
+    
+  - deployment: DeployFrontend
+    displayName: Deploy Frontend
+    environment: frontend-deploy
     pool:
       vmImage: "ubuntu-16.04"
     strategy:
