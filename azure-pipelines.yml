@@ -13,6 +13,8 @@ jobs:
       - script: ./gradlew jibDockerBuild --image=$(IMAGE_NAME)
         displayName: Build API docker image
         workingDirectory: api/
+      - script: docker tag $(IMAGE_NAME):latest $(IMAGE_NAME):$(Build.SourceVersion)
+        displayName: Tag image
       - task: Docker@2
         displayName: Log into docker hub
         inputs:
