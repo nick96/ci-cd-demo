@@ -1,0 +1,32 @@
+-------------------------------------------------------------------------------
+Test set: me.nspain.demo.ConversionControllerTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 3.503 s <<< FAILURE! - in me.nspain.demo.ConversionControllerTest
+getConversionFromKgToLb  Time elapsed: 0.495 s  <<< ERROR!
+org.springframework.web.client.RestClientException: 
+Error while extracting response for type [class me.nspain.demo.Response] and content type [application/json;charset=UTF-8]; nested exception is org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Instantiation of [simple type, class me.nspain.demo.Response] value failed for JSON property conversion due to missing (therefore NULL) value for creator parameter conversion which is a non-nullable type; nested exception is com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException: Instantiation of [simple type, class me.nspain.demo.Response] value failed for JSON property conversion due to missing (therefore NULL) value for creator parameter conversion which is a non-nullable type
+ at [Source: (PushbackInputStream); line: 1, column: 290] (through reference chain: me.nspain.demo.Response["conversion"])
+	at me.nspain.demo.ConversionControllerTest.getConversionFromKgToLb(ConversionControllerTest.kt:38)
+Caused by: org.springframework.http.converter.HttpMessageNotReadableException: 
+JSON parse error: Instantiation of [simple type, class me.nspain.demo.Response] value failed for JSON property conversion due to missing (therefore NULL) value for creator parameter conversion which is a non-nullable type; nested exception is com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException: Instantiation of [simple type, class me.nspain.demo.Response] value failed for JSON property conversion due to missing (therefore NULL) value for creator parameter conversion which is a non-nullable type
+ at [Source: (PushbackInputStream); line: 1, column: 290] (through reference chain: me.nspain.demo.Response["conversion"])
+	at me.nspain.demo.ConversionControllerTest.getConversionFromKgToLb(ConversionControllerTest.kt:38)
+Caused by: com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException: 
+Instantiation of [simple type, class me.nspain.demo.Response] value failed for JSON property conversion due to missing (therefore NULL) value for creator parameter conversion which is a non-nullable type
+ at [Source: (PushbackInputStream); line: 1, column: 290] (through reference chain: me.nspain.demo.Response["conversion"])
+	at me.nspain.demo.ConversionControllerTest.getConversionFromKgToLb(ConversionControllerTest.kt:38)
+
+getConversionFromLbToKg  Time elapsed: 0.035 s  <<< ERROR!
+org.springframework.web.client.RestClientException: 
+Error while extracting response for type [class me.nspain.demo.Response] and content type [application/json;charset=UTF-8]; nested exception is org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Instantiation of [simple type, class me.nspain.demo.Response] value failed for JSON property conversion due to missing (therefore NULL) value for creator parameter conversion which is a non-nullable type; nested exception is com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException: Instantiation of [simple type, class me.nspain.demo.Response] value failed for JSON property conversion due to missing (therefore NULL) value for creator parameter conversion which is a non-nullable type
+ at [Source: (PushbackInputStream); line: 1, column: 290] (through reference chain: me.nspain.demo.Response["conversion"])
+	at me.nspain.demo.ConversionControllerTest.getConversionFromLbToKg(ConversionControllerTest.kt:39)
+Caused by: org.springframework.http.converter.HttpMessageNotReadableException: 
+JSON parse error: Instantiation of [simple type, class me.nspain.demo.Response] value failed for JSON property conversion due to missing (therefore NULL) value for creator parameter conversion which is a non-nullable type; nested exception is com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException: Instantiation of [simple type, class me.nspain.demo.Response] value failed for JSON property conversion due to missing (therefore NULL) value for creator parameter conversion which is a non-nullable type
+ at [Source: (PushbackInputStream); line: 1, column: 290] (through reference chain: me.nspain.demo.Response["conversion"])
+	at me.nspain.demo.ConversionControllerTest.getConversionFromLbToKg(ConversionControllerTest.kt:39)
+Caused by: com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException: 
+Instantiation of [simple type, class me.nspain.demo.Response] value failed for JSON property conversion due to missing (therefore NULL) value for creator parameter conversion which is a non-nullable type
+ at [Source: (PushbackInputStream); line: 1, column: 290] (through reference chain: me.nspain.demo.Response["conversion"])
+	at me.nspain.demo.ConversionControllerTest.getConversionFromLbToKg(ConversionControllerTest.kt:39)
+
