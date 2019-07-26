@@ -13,6 +13,9 @@ steps:
   workingDirectory: api/
   displayName: Build API docker image
 
+- script: docker save $(API_IMAGE_NAME) | gzip > $(API_IMAGE_NAME).tar.gz
+  displayName: Archive docker image
+
 - script: yarn install
   workingDirectory: frontend/
   displayName: Install frontend dependencies
