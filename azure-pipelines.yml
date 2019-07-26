@@ -1,0 +1,31 @@
+parameters:
+  API_IMAGE_NAME: demo-api
+
+pool:
+  vmImage: 'Ubuntu-16.04'
+
+steps:
+- script: ./gradlew clean test
+  workingDirectory: api/
+  displayName: Test API
+
+- script: ./gradlew jibDockerBuild --image=${{parameters.API_IMAGE_NAME}}
+  workingDirectory: api/
+  displayName: Build API docker image
+
+- script: yarn install
+  workingDirectory: frontend/
+  displayName: Install frontend dependencies
+
+- script: CI=true yarn test
+  workingDirectory: frontend/
+  displayName: Test frontend
+
+- script: yarn build
+  workingDirectory: frontend/
+  displayName: Build frontend
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    ArtifactName: frontend
+    PathtoPublish: frontend/build
