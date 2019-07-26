@@ -10,7 +10,7 @@ jobs:
       - script: ./gradlew test
         displayName: Test API
         workingDirectory: api/
-      - script: ./gradlew jibDockerBuild --image=$(API_IMAGE_NAME)
+      - script: ./gradlew jibDockerBuild --image=$(IMAGE_NAME)
         displayName: Build API docker image
         workingDirectory: api/
       - task: Docker@2
