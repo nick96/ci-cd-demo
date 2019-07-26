@@ -1,34 +1,56 @@
 variables:
   API_IMAGE_NAME: demo-api
 
-pool:
-  vmImage: 'Ubuntu-16.04'
+jobs:
+  - job: Test
+    pool:
+      vmImage: "ubuntu-16.04"
+    steps:
+      - script: ./gradlew test
+        displayName: Test API
+        workingDirectory: api/
+      - script: yarn install && CI=1 yarn test
+        displayName: Test frontend
+        workingDirectory: frontend
 
-steps:
-- script: ./gradlew clean test
-  workingDirectory: api/
-  displayName: Test API
+  - job: Build
+    pool:
+      vmImage: "ubuntu-16.04"
+    steps:
+      - script: ./gradlew jibDockerBuild --image=$(API_IMAGE_NAME)
+        displayName: Build API docker image
+        workingDirectory: api/
+      - script: yarn build
+        displayName: Build frontend
+        workingDirectory: frontedn/
 
-- script: ./gradlew jibDockerBuild --image=$(API_IMAGE_NAME)
-  workingDirectory: api/
-  displayName: Build API docker image
+  - job: Archive
+    pool:
+      vmImage: "ubuntu-16.04"
+    steps:
+    - task: Docker@2
+      displayName: Log into docker hub
+      inputs:
+        command: login
+        containerRegistry: nick96-docker-hub
+    - task: Docker@2
+      displayName: Push API docker image to container registry
+      inputs:
+        command: push
+        containerRegistry: nick96-docker-hub
+        tags: $(Build.SourceVersion)
+    - task: PublishBuildArtifacts@1
+      displayName: Archive frontend artifacts
+      inputs:
+        ArtifactName: frontend
+        PathtoPublish: frontend/build
 
-- script: docker save $(API_IMAGE_NAME) | gzip > $(API_IMAGE_NAME).tar.gz
-  displayName: Archive docker image
-
-- script: yarn install
-  workingDirectory: frontend/
-  displayName: Install frontend dependencies
-
-- script: CI=true yarn test
-  workingDirectory: frontend/
-  displayName: Test frontend
-
-- script: yarn build
-  workingDirectory: frontend/
-  displayName: Build frontend
-
-- task: PublishBuildArtifacts@1
-  inputs:
-    ArtifactName: frontend
-    PathtoPublish: frontend/build
+  - deployment: Deploy
+    displayName: Deploy API and Frontend
+    pool:
+      vmImage: "ubuntu-16.04"
+    strategy:
+      runOnce:
+        steps:
+          - script: echo 'Hello, World!'
+            displayName: Placeholder
