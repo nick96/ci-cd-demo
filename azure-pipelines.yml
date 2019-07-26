@@ -1,68 +1,74 @@
-variables:
-  API_IMAGE_NAME: demo-api
-
 jobs:
-  - job: Test
+
+  - job: APITestAndBuild
+    displayName: API test and build
+    variables:
+      IMAGE_NAME: demo-api
     pool:
       vmImage: "ubuntu-16.04"
     steps:
       - script: ./gradlew test
         displayName: Test API
         workingDirectory: api/
-      - script: yarn install && CI=1 yarn test
-        displayName: Test frontend
-        workingDirectory: frontend
-
-  - job: Build
-    pool:
-      vmImage: "ubuntu-16.04"
-    steps:
       - script: ./gradlew jibDockerBuild --image=$(API_IMAGE_NAME)
         displayName: Build API docker image
         workingDirectory: api/
-      - script: yarn build
-        displayName: Build frontend
-        workingDirectory: frontedn/
+      - task: Docker@2
+        displayName: Log into docker hub
+        inputs:
+          command: login
+          containerRegistry: nick96-docker-hub
+      - task: Docker@2
+        displayName: Push API docker image to container registry
+        inputs:
+          command: push
+          containerRegistry: nick96-docker-hub
+          tags: $(Build.SourceVersion)
 
-  - job: Archive
+  - job: FrontendTestAndBuild
+    displayName: Frontend test and build
     pool:
       vmImage: "ubuntu-16.04"
     steps:
-    - task: Docker@2
-      displayName: Log into docker hub
-      inputs:
-        command: login
-        containerRegistry: nick96-docker-hub
-    - task: Docker@2
-      displayName: Push API docker image to container registry
-      inputs:
-        command: push
-        containerRegistry: nick96-docker-hub
-        tags: $(Build.SourceVersion)
-    - task: PublishBuildArtifacts@1
-      displayName: Archive frontend artifacts
-      inputs:
-        ArtifactName: frontend
-        PathtoPublish: frontend/build
+      - script: yarn install && CI=1 yarn test
+        displayName: Test frontend
+        workingDirectory: frontend
+      - script: yarn build
+        displayName: Build frontend
+        workingDirectory: frontend
+      - task: PublishBuildArtifacts@1
+        displayName: Archive frontend artifacts
+        inputs:
+          ArtifactName: frontend
+          PathtoPublish: frontend/build
 
-  - deployment: DeployAPI
-    displayName: Deploy API
+  - deployment: APIDeploy
+    displayName: API deployment
     environment: api-deploy
+    dependsOn: APITestAndBuild
     pool:
       vmImage: "ubuntu-16.04"
     strategy:
       runOnce:
         deploy:
           steps:
-          - script: echo 'Hello, World!'
-    
-  - deployment: DeployFrontend
-    displayName: Deploy Frontend
+          - script: echo "TODO Invoke terraform plan"
+            displayName: "Terraform plan"
+          - script: echo "TODO Invoke terraform apply"
+            displayName: "Terraform apply"
+          - script: echo "TODO Invoke ansible playbook"
+            displayName: "Ansible deployment"
+
+  - deployment: FrontendDeploy
+    displayName: Frontend deployment
     environment: frontend-deploy
+    dependsOn: FrontendTestAndBuild
     pool:
       vmImage: "ubuntu-16.04"
     strategy:
       runOnce:
         deploy:
           steps:
-          - script: echo 'Hello, World!'
+          - download: current
+            artifact: frontend
+          
