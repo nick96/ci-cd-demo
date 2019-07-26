@@ -1,20 +1,23 @@
 package me.nspain.demo
 
+import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @SpringBootApplication
-class DemoApplication
+open class DemoApplication
 
 fun main(args: Array<String>) {
 	runApplication<DemoApplication>(*args)
 }
 
-@RestController("/conversion")
+@RestController
+@RequestMapping("/conversion")
 class ConversionController {
 
 	val conversions = listOf("lb", "kg")
@@ -22,10 +25,14 @@ class ConversionController {
 	val TO_KG = 0.45359237
 	val TO_LB = 2.20462262185
 
+	val logger = LoggerFactory.getLogger(this::class.java)
 
-	@GetMapping("/")
+
+	@GetMapping
 	fun getConversion(@RequestParam from: String, @RequestParam to: String, @RequestParam value: Double): ResponseEntity<Response> {
+		logger.info("Received request with from='$from', to='$to' and value='$value'")
 		if (!conversions.containsAll(listOf(from, to))) {
+			logger.info("Invalid value for from or to")
 			return ResponseEntity.badRequest().build()
 		}
 
@@ -34,6 +41,7 @@ class ConversionController {
 			"lb" -> fromLb(to, value)
 			else -> { return ResponseEntity.badRequest().build() }
 		}!!
+		logger.info("Converted $value$from to $converted$to")
 
 		val resp = Response("$from to $to", converted)
 		return ResponseEntity.ok(resp)

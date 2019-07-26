@@ -1,0 +1,34 @@
+GET http://localhost:8000/conversion?from=kg&to=lb&value=5
+
+<> 2019-07-26T101411.200.json
+
+###
+
+GET http://localhost:8000/conversion?from=kg&to=lb&value=5
+
+<> 2019-07-26T101351.404.json
+
+###
+
+GET http://localhost:8000/conversion/?from=kg&to=lb&value=5
+
+<> 2019-07-26T101117.200.json
+
+###
+
+GET http://localhost:8000/conversion?from=kg&to=lb&value=5
+
+<> 2019-07-26T101058.404.json
+
+###
+
+GET http://localhost:8000?from=kg&to=lb&value=5
+
+<> 2019-07-26T101038.404.json
+
+###
+
+GET http://localhost:5000
+
+###
+
