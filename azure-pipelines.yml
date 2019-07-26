@@ -9,7 +9,7 @@ steps:
   workingDirectory: api/
   displayName: Test API
 
-- script: ./gradlew jibDockerBuild --image=$(parameters.API_IMAGE_NAME)
+- script: ./gradlew jibDockerBuild --image=$(API_IMAGE_NAME)
   workingDirectory: api/
   displayName: Build API docker image
 
