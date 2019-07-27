@@ -1,64 +1,65 @@
 ---
-hosts: api-servers
-become: true
-tasks:
-  # Install docker
-  - name: Install apt HTTPS prereqs
-    apt:
-      name: apt-transport-https ca-certificates curl software-properties-common
-      update_cache: yes
-  - name: Add Docker GPG key
-    apt_key:
-      url: https://download.docker.com/linux/ubuntu/gpg
-      state: present
-  - name: Add Docker repository to apt sources
-    apt_repository:
-      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
-      state: present
-  - name: Install Docker
-    apt:
-      name: docker-ce
-      update_cache: yes
-  - name: Ensure the Docker service is running
-    service:
-      name: docker
-      state: started
-  - name: Ensure Python docker library is installed
-    pip:
-      name: docker
-      state: present
+- name: Deploy API behind traefik
+  hosts: api-servers
+  become: true
+  tasks:
+    # Install docker
+    - name: Install apt HTTPS prereqs
+      apt:
+        name: apt-transport-https ca-certificates curl software-properties-common
+        update_cache: yes
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+    - name: Add Docker repository to apt sources
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        update_cache: yes
+    - name: Ensure the Docker service is running
+      service:
+        name: docker
+        state: started
+    - name: Ensure Python docker library is installed
+      pip:
+        name: docker
+        state: present
 
-  # Create the shared network
-  - name: Create docker network
-    docker_network:
-      name: web
+    # Create the shared network
+    - name: Create docker network
+      docker_network:
+        name: web
 
-  # Install traefik
-  - name: Copy traefik config
-    template:
-      src: traefik.toml.j2
-      dest: /etc/traefik/traefik.toml
-  - name: Run traefik container
-    docker_container:
-      name: traefik
-      image: traefik:v1.7.12
-      volumes:
-        - /etc/traefik:/etc/traefik
-        - /var/run/docker.sock:/var/run/docker.sock
-      ports:
-        - "80:80"
-      restart_policy: unless-stopped
-      networks:
-        - web
+    # Install traefik
+    - name: Copy traefik config
+      template:
+        src: traefik.toml.j2
+        dest: /etc/traefik/traefik.toml
+    - name: Run traefik container
+      docker_container:
+        name: traefik
+        image: traefik:v1.7.12
+        volumes:
+          - /etc/traefik:/etc/traefik
+          - /var/run/docker.sock:/var/run/docker.sock
+        ports:
+          - "80:80"
+        restart_policy: unless-stopped
+        networks:
+          - web
 
-  # Install API
-  - name: Run API container
-    docker_container:
-      name: demo-api
-      image: "{{ api_image }}"
-      exposed_ports:
-        - 8080
-      restart_policy: unless-stopped
-      networks:
-        - web
+    # Install API
+    - name: Run API container
+      docker_container:
+        name: demo-api
+        image: "{{ api_image }}"
+        exposed_ports:
+          - 8080
+        restart_policy: unless-stopped
+        networks:
+          - web
 
