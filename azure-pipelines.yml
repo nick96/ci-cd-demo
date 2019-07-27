@@ -84,7 +84,7 @@ jobs:
           - download: current
             artifact: frontend
             displayName: Retrieve frontend artifacts
-          - script: yarn add -g firebase-tools
+          - script: npm install -g firebase-tools
             displayName: Install firebase CLI
           - script: firebase deploy --public frontend --token=$(FIREBASE_TOKEN)
           
