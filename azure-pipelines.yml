@@ -1,5 +1,5 @@
 variables:
-  - group: Secrets
+  - group: demo-vars
 
 jobs:
   - job: APITestAndBuild
@@ -29,6 +29,11 @@ jobs:
           containerRegistry: nick96-docker-hub
           repository: $(IMAGE_NAME)
           tags: $(Build.SourceVersion)
+      - task: PublishBuildArtifacts@1
+        displayName: Archive playbook for usage in deployment
+        inputs:
+          ArtifactName: playbook
+          PathtoPublish: api/playbook/*
 
   - job: FrontendTestAndBuild
     displayName: Frontend test and build
@@ -57,8 +62,14 @@ jobs:
       runOnce:
         deploy:
           steps:
-          - script: echo "TODO Invoke ansible playbook"
-            displayName: "Ansible deployment"
+          - download: current
+            artifact: playbook
+            displayName: Retrieve playbook
+          - script: |
+              ansible-playbook -v playbook/playbook.yml \
+                 -i playbook/hosts \
+                 --extra-vars "api_image=$(IMAGE_NAME):$(Build.SourceVersion) email=$(EMAIL)"
+            displayName: Ansible deployment
 
   - deployment: FrontendDeploy
     displayName: Frontend deployment
