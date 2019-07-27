@@ -1,5 +1,7 @@
-jobs:
+variables:
+  - group: Secrets
 
+jobs:
   - job: APITestAndBuild
     displayName: API test and build
     variables:
@@ -55,10 +57,6 @@ jobs:
       runOnce:
         deploy:
           steps:
-          - script: echo "TODO Invoke terraform plan"
-            displayName: "Terraform plan"
-          - script: echo "TODO Invoke terraform apply"
-            displayName: "Terraform apply"
           - script: echo "TODO Invoke ansible playbook"
             displayName: "Ansible deployment"
 
