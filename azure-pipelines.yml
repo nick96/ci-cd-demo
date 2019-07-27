@@ -33,7 +33,7 @@ jobs:
         displayName: Archive playbook for usage in deployment
         inputs:
           ArtifactName: playbook
-          PathtoPublish: api/playbook/*
+          PathtoPublish: api/playbook
 
   - job: FrontendTestAndBuild
     displayName: Frontend test and build
