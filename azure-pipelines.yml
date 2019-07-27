@@ -2,7 +2,7 @@ variables:
   - group: demo-vars
 
 jobs:
-  - job: APITestAndBuild
+  - job: API
     displayName: API test and build
     variables:
       IMAGE_NAME: nick96/demo-api
@@ -36,7 +36,7 @@ jobs:
         displayName: Ansible deployment
         workingDirectory: 'api/playbook'
 
-  - job: FrontendTestAndBuild
+  - job: Frontend
     displayName: Frontend test and build
     pool:
       vmImage: "ubuntu-16.04"
