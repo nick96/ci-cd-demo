@@ -74,10 +74,11 @@ jobs:
             artifact: playbook
             displayName: Retrieve playbook
           - script: |
-              ansible-playbook -v playbook/playbook.yml \
+              ansible-playbook -v playbook.yml \
                  -i playbook/hosts \
                  --extra-vars "api_image=$(IMAGE_NAME):$(Build.SourceVersion) email=$(EMAIL)"
             displayName: Ansible deployment
+            workingDirectory: '$(Pipeline.Workspace)/playbook'
 
   - deployment: FrontendDeploy
     displayName: Frontend deployment
@@ -95,6 +96,6 @@ jobs:
           - script: sudo npm install -g firebase-tools
             displayName: Install firebase CLI
           - script: sudo firebase deploy --token=$(FIREBASE_TOKEN)
-            workingDirectory: frontend
+            workingDirectory: '$(Pipeline.Workspace)/frontend'
             displayName: Firebase deploy
           
