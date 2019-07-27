@@ -1,1 +1,3 @@
 api/terraform/terraform.tfvars
+api/playbook/azure_id_rsa
+api/playbook/azure_id_rsa.pub
