@@ -39,7 +39,7 @@ jobs:
               ansible-playbook -v playbook.yml \
                  -i hosts \
                  -u root \
-                 --extra-vars "api_image=$(IMAGE_NAME):$(Build.SourceVersion) email=$(EMAIL) ansible_python_interpreter=/usr/bin/python3" \
+                 --extra-vars "api_image=$(IMAGE_NAME):$(Build.SourceVersion) email=$(EMAIL) ansible_python_interpreter=/usr/bin/python3 ansible_ssh_common_args='-o StrictHostKeyChecking=no'" \
                  --private-key $(sshKey.secureFilePath)
         displayName: Ansible deployment
         workingDirectory: 'api/playbook'
