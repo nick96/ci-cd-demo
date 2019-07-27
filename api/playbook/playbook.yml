@@ -6,7 +6,12 @@
     # Install docker
     - name: Install apt HTTPS prereqs
       apt:
-        name: apt-transport-https ca-certificates curl software-properties-common
+        name: 
+          - apt-transport-https 
+          - ca-certificates 
+          - curl 
+          - software-properties-common
+          - python3-pip
         update_cache: yes
     - name: Add Docker GPG key
       apt_key:
@@ -35,6 +40,10 @@
         name: web
 
     # Install traefik
+    - name: Create traefik directory
+      file:
+        path: /etc/traefik
+        state: directory
     - name: Copy traefik config
       template:
         src: traefik.toml.j2
@@ -50,7 +59,7 @@
           - "80:80"
         restart_policy: unless-stopped
         networks:
-          - web
+          - name: web
 
     # Install API
     - name: Run API container
@@ -61,5 +70,5 @@
           - 8080
         restart_policy: unless-stopped
         networks:
-          - web
+          - name: web
 
