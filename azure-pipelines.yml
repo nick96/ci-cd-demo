@@ -49,6 +49,6 @@ jobs:
         workingDirectory: frontend
       - script: sudo npm install -g firebase-tools
         displayName: Install firebase CLI
-      - script: sudo firebase deploy --token=$(FIREBASE_TOKEN)
+      - script: sudo firebase deploy --token=$(FIREBASE_TOKEN) --project $(FIREBASE_PROJECT)
         workingDirectory: frontend
         displayName: Firebase deploy
