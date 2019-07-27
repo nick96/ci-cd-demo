@@ -28,7 +28,9 @@ jobs:
           command: push
           containerRegistry: nick96-docker-hub
           repository: $(IMAGE_NAME)
-          tags: $(Build.SourceVersion), latest
+          tags: |
+           $(Build.SourceVersion)
+           latest
       - task: DownloadSecureFile@1
         name: sshKey
         inputs:
