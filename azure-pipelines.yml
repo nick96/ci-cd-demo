@@ -46,11 +46,19 @@ jobs:
       - script: yarn build
         displayName: Build frontend
         workingDirectory: frontend
+      - task: CopyFiles@2
+        inputs:
+          Contents: frontend/build
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/build'
+      - task: CopyFiles@2
+        inputs:
+          Contents: frontend/firebase.json
+          TargetFolder: '$(Build.ArtifactStagingDirectory)' 
       - task: PublishBuildArtifacts@1
         displayName: Archive frontend artifacts
         inputs:
           ArtifactName: frontend
-          PathtoPublish: frontend/build
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)' 
 
   - deployment: APIDeploy
     displayName: API deployment
