@@ -55,6 +55,10 @@ jobs:
       runOnce:
         deploy:
           steps:
+          - script: echo "TODO Invoke terraform plan"
+            displayName: "Terraform plan"
+          - script: echo "TODO Invoke terraform apply"
+            displayName: "Terraform apply"
           - script: echo "TODO Invoke ansible playbook"
             displayName: "Ansible deployment"
 
@@ -70,4 +74,8 @@ jobs:
           steps:
           - download: current
             artifact: frontend
+            displayName: Retrieve frontend artifacts
+          - script: npm install -g firebase-cli
+            displayName: Install firebase CLI
+          - script: firebase deploy --public frontend --token=$(FIREBASE_TOKEN)
           
