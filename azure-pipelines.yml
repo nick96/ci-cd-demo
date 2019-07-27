@@ -29,11 +29,12 @@ jobs:
           containerRegistry: nick96-docker-hub
           repository: $(IMAGE_NAME)
           tags: $(Build.SourceVersion)
-      - task: PublishBuildArtifacts@1
-        displayName: Archive playbook for usage in deployment
-        inputs:
-          ArtifactName: playbook
-          PathtoPublish: api/playbook
+      - script: |
+              ansible-playbook -v playbook.yml \
+                 -i playbook/hosts \
+                 --extra-vars "api_image=$(IMAGE_NAME):$(Build.SourceVersion) email=$(EMAIL)"
+        displayName: Ansible deployment
+        workingDirectory: 'api/playbook'
 
   - job: FrontendTestAndBuild
     displayName: Frontend test and build
@@ -46,68 +47,8 @@ jobs:
       - script: yarn build
         displayName: Build frontend
         workingDirectory: frontend
-      - task: CopyFiles@2
-        displayName: Copy build directory to binaries directory
-        inputs:
-          Contents: frontend/build
-          TargetFolder: '$(Build.BinariesDirectory)/build'
-      - task: CopyFiles@2
-        displayName: Copy firebase config to binaries directory
-        inputs:
-          Contents: frontend/firebase.json
-          TargetFolder: '$(Build.BinariesDirectory)'
-      - task: ArchiveFiles@2
-        displayName: Create artifact zip archive
-        inputs:
-          rootFolderOrFile: '$(Build.SourcesDirectory)'
-          archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-      - task: PublishBuildArtifacts@1
-        displayName: Archive frontend artifacts
-        inputs:
-          ArtifactName: frontend
-          PathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-
-  - deployment: APIDeploy
-    displayName: API deployment
-    environment: api-deploy
-    dependsOn: APITestAndBuild
-    pool:
-      vmImage: "ubuntu-16.04"
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - download: current
-            artifact: playbook
-            displayName: Retrieve playbook
-          - script: |
-              ansible-playbook -v playbook.yml \
-                 -i playbook/hosts \
-                 --extra-vars "api_image=$(IMAGE_NAME):$(Build.SourceVersion) email=$(EMAIL)"
-            displayName: Ansible deployment
-            workingDirectory: '$(Pipeline.Workspace)/playbook'
-
-  - deployment: FrontendDeploy
-    displayName: Frontend deployment
-    environment: frontend-deploy
-    dependsOn: FrontendTestAndBuild
-    pool:
-      vmImage: "ubuntu-16.04"
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - download: current
-            artifact: frontend
-            displayName: Retrieve frontend artifacts
-          - task: ExtractFiles@1
-            displayName: Expand frontend artifacts
-            inputs:
-              archiveFilePatterns: 'frontend/*.zip'
-              destinationFile: artifacts
-          - script: sudo npm install -g firebase-tools
-            displayName: Install firebase CLI
-          - script: sudo firebase deploy --token=$(FIREBASE_TOKEN)
-            workingDirectory: artifacts
-            displayName: Firebase deploy
-          
+      - script: sudo npm install -g firebase-tools
+        displayName: Install firebase CLI
+      - script: sudo firebase deploy --token=$(FIREBASE_TOKEN)
+        workingDirectory: frontend
+        displayName: Firebase deploy
