@@ -18,7 +18,7 @@ resource "digitalocean_domain" "domain" {
 resource "digitalocean_record" "www_api" {
   domain = "${digitalocean_domain.domain.name}"
   type   = "A"
-  name   = "www-api"
+  name   = "@"
   value  = "${digitalocean_droplet.api.ipv4_address }"
 }
 
