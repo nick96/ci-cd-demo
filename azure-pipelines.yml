@@ -47,18 +47,25 @@ jobs:
         displayName: Build frontend
         workingDirectory: frontend
       - task: CopyFiles@2
+        displayName: Copy build directory to binaries directory
         inputs:
           Contents: frontend/build
-          TargetFolder: '$(Build.ArtifactStagingDirectory)/build'
+          TargetFolder: '$(Build.BinariesDirectory)/build'
       - task: CopyFiles@2
+        displayName: Copy firebase config to binaries directory
         inputs:
           Contents: frontend/firebase.json
-          TargetFolder: '$(Build.ArtifactStagingDirectory)' 
+          TargetFolder: '$(Build.BinariesDirectory)'
+      - task: ArchiveFiles@2
+        displayName: Create artifact zip archive
+        inputs:
+          rootFolderOrFile: '$(Build.SourcesDirectory)'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
       - task: PublishBuildArtifacts@1
         displayName: Archive frontend artifacts
         inputs:
           ArtifactName: frontend
-          PathtoPublish: '$(Build.ArtifactStagingDirectory)/*' 
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)' 
 
   - deployment: APIDeploy
     displayName: API deployment
@@ -93,9 +100,14 @@ jobs:
           - download: current
             artifact: frontend
             displayName: Retrieve frontend artifacts
+          - task: ExtractFiles@1
+            displayName: Expand frontend artifacts
+            inputs:
+              archiveFilePatterns: 'frontend/*.zip'
+              destinationFile: artifacts
           - script: sudo npm install -g firebase-tools
             displayName: Install firebase CLI
           - script: sudo firebase deploy --token=$(FIREBASE_TOKEN)
-            workingDirectory: '$(Pipeline.Workspace)/frontend'
+            workingDirectory: artifacts
             displayName: Firebase deploy
           
