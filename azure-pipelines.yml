@@ -31,7 +31,7 @@ jobs:
           tags: $(Build.SourceVersion)
       - script: |
               ansible-playbook -v playbook.yml \
-                 -i playbook/hosts \
+                 -i nspain.me \
                  --extra-vars "api_image=$(IMAGE_NAME):$(Build.SourceVersion) email=$(EMAIL)"
         displayName: Ansible deployment
         workingDirectory: 'api/playbook'
