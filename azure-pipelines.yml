@@ -86,5 +86,5 @@ jobs:
             displayName: Retrieve frontend artifacts
           - script: sudo npm install -g firebase-tools
             displayName: Install firebase CLI
-          - script: firebase deploy --public frontend --token=$(FIREBASE_TOKEN)
+          - script: sudo firebase deploy --public frontend --token=$(FIREBASE_TOKEN)
           
