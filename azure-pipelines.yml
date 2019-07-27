@@ -28,7 +28,7 @@ jobs:
           command: push
           containerRegistry: nick96-docker-hub
           repository: $(IMAGE_NAME)
-          tags: $(Build.SourceVersion)
+          tags: $(Build.SourceVersion), latest
       - task: InstallSSHKey@0
         displayName: Install SSH Key
         inputs:
