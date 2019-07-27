@@ -1,6 +1,6 @@
 ---
 - name: Deploy API behind traefik
-  hosts: api-servers
+  hosts: all
   become: true
   tasks:
     # Install docker
