@@ -96,4 +96,5 @@ jobs:
             displayName: Install firebase CLI
           - script: sudo firebase deploy --token=$(FIREBASE_TOKEN)
             workingDirectory: frontend
+            displayName: Firebase deploy
           
