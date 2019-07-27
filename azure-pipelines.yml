@@ -29,17 +29,16 @@ jobs:
           containerRegistry: nick96-docker-hub
           repository: $(IMAGE_NAME)
           tags: $(Build.SourceVersion), latest
-      - task: InstallSSHKey@0
-        displayName: Install SSH Key
+      - task: DownloadSecureFile@1
+        name: sshKey
         inputs:
-          knownHostsEntry: 
-          sshPublicKey:
-          sshKeySecureFile: azure_id_rsa
+          secureFile: azure_id_rsa
       - script: |
               ansible-playbook -v playbook.yml \
                  -i hosts \
                  -u root \
-                 --extra-vars "api_image=$(IMAGE_NAME):$(Build.SourceVersion) email=$(EMAIL) ansible_python_interpreter=/usr/bin/python3"
+                 --extra-vars "api_image=$(IMAGE_NAME):$(Build.SourceVersion) email=$(EMAIL) ansible_python_interpreter=/usr/bin/python3" \
+                 --private-key $(sshKey.secureFilePath)
         displayName: Ansible deployment
         workingDirectory: 'api/playbook'
 
