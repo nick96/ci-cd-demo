@@ -7,7 +7,7 @@ provider "digitalocean" {
 resource "digitalocean_droplet" "api" {
   image  = "ubuntu-18-04-x64"
   name   = "api-1"
-  region = "nyc2"
+  region = "sgp1"
   size   = "s-1vcpu-1gb"
 }
 
