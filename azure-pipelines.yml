@@ -32,6 +32,7 @@ jobs:
            $(Build.SourceVersion)
            latest
       - task: DownloadSecureFile@1
+        displayName: Download SSH key
         name: sshKey
         inputs:
           secureFile: azure_id_rsa
