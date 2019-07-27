@@ -9,10 +9,10 @@ jobs:
     pool:
       vmImage: "ubuntu-16.04"
     steps:
-      - script: ./gradlew test
+      - script: ./gradlew test --no-daemon
         displayName: Test API
         workingDirectory: api/
-      - script: ./gradlew jibDockerBuild --image=$(IMAGE_NAME)
+      - script: ./gradlew jibDockerBuild --image=$(IMAGE_NAME) --no-daemon
         displayName: Build API docker image
         workingDirectory: api/
       - script: docker tag $(IMAGE_NAME):latest $(IMAGE_NAME):$(Build.SourceVersion)
