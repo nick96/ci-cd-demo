@@ -58,7 +58,7 @@ jobs:
         displayName: Archive frontend artifacts
         inputs:
           ArtifactName: frontend
-          PathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)/*' 
 
   - deployment: APIDeploy
     displayName: API deployment
