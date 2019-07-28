@@ -29,13 +29,20 @@ jobs:
           path: build/test-results/test
       - store_artifacts:
           path: build/test-results/test
+      - setup_remote_docker
       - run:
-          name: Log into docker
-          command: echo "$DOCKERHUB_PSW" | docker login --username "$DOCKERHUB_USR" --password-stdin
-      - run:
-          name: Build and push docker image
-          command: ./gradlew jib --image "$IMAGE_NAME"
+          name: Build docker image
+          command: ./gradlew jibDockerBuild --image "$IMAGE_NAME"
           working_directory: api/
+      - run:
+          name: Tag docker image
+          command: docker tag "${IMAGE_NAME}:latest" "${IMAGE_NAME}:${CIRCLE_SHA1}" 
+      - run:
+          name: Push docker image
+          command: |
+            echo "$DOCKERHUB_PSW" | docker login --username "$DOCKERHUB_USR" --password-stdin
+            docker push "${IMAGE_NAME}:latest"
+            docker push "${IMAGE_NAME}:${CIRCLE_SHA1}"
 
   build_test_frontend:
     docker:
