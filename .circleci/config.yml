@@ -98,7 +98,7 @@ jobs:
                  -i hosts \
                  -u root \
                  --extra-vars "api_image=$IMAGE_NAME email=$LETS_ENCRYPT_EMAIL ansible_python_interpreter=/usr/bin/python33"
-          working_directory: /tmp/workspace/ansible
+          working_directory: /tmp/workspace/playbook
 
 
   deploy_frontend:
