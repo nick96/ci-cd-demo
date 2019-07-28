@@ -47,7 +47,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - api/ansible
+            - api/playbook
 
   build_test_frontend:
     docker:
