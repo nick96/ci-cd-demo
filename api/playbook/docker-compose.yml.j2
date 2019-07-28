@@ -16,6 +16,8 @@ services:
       - 8080
   traefik:
     image: traefik:{{ traefik_version }}
+    environment:
+      DO_AUTH_TOKEN: {{ digitalocean_token }}
     ports:
       - 80:80
       - 443:443
