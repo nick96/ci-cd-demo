@@ -103,6 +103,7 @@ jobs:
       - run:
           name: Deploy frontend to firebase hosting
           command: sudo firebase deploy --token=$FIREBASE_TOKEN
+          working_directory: frontend
       
 workflows:
   version: 2
