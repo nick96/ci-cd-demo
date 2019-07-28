@@ -1,15 +1,23 @@
+logLevel = "DEBUG"
+
 [file]
 watch = true
 
 [entryPoints]
+  [entryPoints.http]
+  address = ":80"
+    [entryPoints.http.redirect]
+    entryPoint = "https"
   [entryPoints.https]
   address = ":443"
-    [entryPoints.https.tls]
 
 [acme]
-email = "{{email}}"
+email = "{{ letsencrypt_email }}"
 storageFile = "/etc/traefik/acme.json"
 entryPoint = "https"
 caServer = "https://acme-staging.api.letsencrypt.org/directory"
+[acme.dnsChallenge]
+  provider = "digitalocean"
+  delayBeforeCheck = 0
 [[acme.domains]]
    main = "demo.nspain.me"
