@@ -92,7 +92,7 @@ jobs:
             sudo pip install ansible==2.8.3
       - add_ssh_keys:
           fingerprints:
-            - "$SSH_KEY_FINGERPRINT"
+            - "cc:5a:d8:0a:4a:57:28:34:48:e7:5b:06:26:7e:36:2c"
       - run:
           name: Deploy API
           command: |
