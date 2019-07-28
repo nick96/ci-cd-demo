@@ -89,14 +89,14 @@ jobs:
       - image: circleci/node:10.1.0
     steps:
       - attach_workspace:
-          at: /project
+          at: /tmp/workspace
       - run:
           name: Install firebase-tools
           command: sudo npm install -g firebase-tools
       - run:
           name: Deploy frontend to firebase hosting
           command: sudo firebase deploy --token=$FIREBASE_TOKEN
-          working_directory: /project/frontend
+          working_directory: /tmp/workspace/frontend
       
 workflows:
   version: 2
