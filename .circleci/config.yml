@@ -45,9 +45,9 @@ jobs:
             docker push "${IMAGE_NAME}:${CIRCLE_SHA1}"
       - run: ls -R
       - persist_to_workspace:
-          root: .
+          root: api
           paths:
-            - api/playbook
+            - playbook
 
   build_test_frontend:
     docker:
@@ -92,7 +92,7 @@ jobs:
             sudo pip install ansible==2.8.3
       - run:
           name: Deploy API
-          command: | 
+          command: |
             ansible-playbook -v playbook.yml \
                  -vvvv \
                  -i hosts \
