@@ -1,0 +1,113 @@
+version: 2
+jobs:
+  build_test_api:
+    docker:
+      - image: circleci/openjdk:11.0.3-jdk-stretch
+    environment:
+      _JAVA_OPTIONS: "-Xmx3g"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
+      IMAGE_NAME: "nick96/demo-api"
+    steps:
+      - checkout
+      - run:
+          name: Move into api directory
+          command: cd api/
+      - restore_cache:
+          key: v1-gradle-wrapper-{{ checksum  "gradle/wrapper/gradle-wrapper.properties" }}
+      - restore_cache:
+          key: v1-gradle-cache-{{ checksum "build.gradle" }}
+      - run:
+          name: Run tests
+          command: ./gradelw test
+      - save_cache:
+          paths:
+            - ~/.gradle/wrapper
+          key: v1-gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+      - save_cache:
+          paths:
+            - ~/.gradle/caches
+          key: v1-gradle-cache-{{ checksum "build.gradle" }}
+      - store_test_results:
+          path: build/test-results/test
+      - store_artifacts:
+          path: build/test-results/test
+      - run:
+          name: Log into docker
+          command: echo "$DOCKERHUB_PSW" | docker login --username "$DOCKERHUB_USR" --password-stdin
+      - run:
+          name: Build and push docker image
+          command: ./gradlew jib --image "$IMAGE_NAME"
+
+  build_test_frontend:
+    machine:
+      image: ubuntu-1604:201903-01 
+    environment:
+      CI: "1"
+      IMAGE_NAME: "nick96/demo-api"
+    steps:
+      - checkout
+      - run:
+          name: Move into frontend directory
+          command: cd frontend/
+      - restore_cache:
+          keys:
+            - yarn-packages-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install dependencies and test
+          command: yarn install --frozen-lockfile && yarn test
+      - save_cache:
+          paths:
+            - ~/.cache/yarn
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+      - run:
+          name: Production build
+          command: yarn build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  deploy_api:
+    docker:
+      - image: ansible/ansible:ubuntu1604
+    environment:
+      ANSIBLE_HOST_KEY_CHECKING: "no"
+    steps:
+      - checkout
+      - run:
+          name: Move into playbook directory
+          command: cd api/playbook
+      - run:
+          name: Deploy API
+          command: | 
+            ansible-playbook -v playbook.yml \
+                 -vvvv \
+                 -i hosts \
+                 -u root \
+                 --extra-vars "api_image=$IMAGE_NAME email=$LETS_ENCRYPT_EMAIL ansible_python_interpreter=/usr/bin/python33"
+
+  deploy_frontend:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - attached_to_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Install firebase-tools
+          command: npm install -g firebase-tools
+      - run:
+          name: Deploy frontend to firebase hosting
+          command: firebase deploy --token=$FIREBASE_TOKEN
+      
+workflows:
+  version: 2
+  build_test_deploy:
+    jobs:
+      - build_test_api
+      - build_test_frontend
+      - deploy_api:
+          requires: 
+            - build_test_api
+      - deploy_frontend:
+          requires:
+            - build_test_frontend
