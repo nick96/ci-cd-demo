@@ -82,6 +82,7 @@ jobs:
       - image: circleci/python:3.6.4
     environment:
       ANSIBLE_HOST_KEY_CHECKING: "no"
+      IMAGE_NAME: "nick96/demo-api"
     steps:
       - attach_workspace:
           at: /tmp/workspace
