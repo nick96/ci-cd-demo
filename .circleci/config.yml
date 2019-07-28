@@ -43,6 +43,10 @@ jobs:
             echo "$DOCKERHUB_PSW" | docker login --username "$DOCKERHUB_USR" --password-stdin
             docker push "${IMAGE_NAME}:latest"
             docker push "${IMAGE_NAME}:${CIRCLE_SHA1}"
+      - persist_to_workspace:
+          root: api
+          paths:
+            - ansible
 
   build_test_frontend:
     docker:
@@ -74,14 +78,15 @@ jobs:
 
   deploy_api:
     docker:
-      - image: ansible/ansible:ubuntu1604
+      - image: circleci/python:3.6.4
     environment:
       ANSIBLE_HOST_KEY_CHECKING: "no"
     steps:
-      - checkout
+      - attach_workspace:
+          at: /tmp/workspace
       - run:
-          name: Move into playbook directory
-          command: cd api/playbook
+          name: Install ansible
+          command: pip install ansible==2.8.3
       - run:
           name: Deploy API
           command: | 
@@ -90,6 +95,8 @@ jobs:
                  -i hosts \
                  -u root \
                  --extra-vars "api_image=$IMAGE_NAME email=$LETS_ENCRYPT_EMAIL ansible_python_interpreter=/usr/bin/python33"
+          working_directory: /tmp/workspace/ansible
+
 
   deploy_frontend:
     docker:
