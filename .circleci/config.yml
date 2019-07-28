@@ -18,7 +18,7 @@ jobs:
           key: v1-gradle-cache-{{ checksum "api/build.gradle" }}
       - run:
           name: Run tests
-          command: ./api/gradelw test
+          command: ./gradlew test
       - save_cache:
           paths:
             - ~/.gradle/wrapper
@@ -36,7 +36,7 @@ jobs:
           command: echo "$DOCKERHUB_PSW" | docker login --username "$DOCKERHUB_USR" --password-stdin
       - run:
           name: Build and push docker image
-          command: ./api/gradlew jib --image "$IMAGE_NAME"
+          command: ./gradlew jib --image "$IMAGE_NAME"
 
   build_test_frontend:
     machine:
