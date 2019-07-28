@@ -1,0 +1,21 @@
+version: '3'
+
+networks:
+  traefik:
+
+services:
+  api:
+    image: {{ api_image }}
+    labels:
+      - traefik.frontend.rule=Host:demo.nspain.me
+      - traefik.docker.network=traefik
+    networks:
+      - internal
+      - web
+    expose:
+      - 8080
+  traefik:
+    image: traefik:{{ traefik_version }}
+    ports:
+      - 80:80
+      - 443:443
