@@ -2,7 +2,10 @@
 - name: Deploy API behind traefik
   hosts: all
   become: true
+  any_errors_fatal: true
+
   tasks:
+
     # Install docker
     - name: Install apt HTTPS prereqs
       apt:
@@ -33,13 +36,8 @@
       pip:
         name: docker
         state: present
-
-    # Create the shared network
-    - name: Create docker network
-      docker_network:
-        name: web
-
-    # Install traefik
+    
+    # Setup traefik config
     - name: Create traefik directory
       file:
         path: /etc/traefik
@@ -48,27 +46,18 @@
       template:
         src: traefik.toml.j2
         dest: /etc/traefik/traefik.toml
-    - name: Run traefik container
-      docker_container:
-        name: traefik
-        image: traefik:v1.7.12
-        volumes:
-          - /etc/traefik:/etc/traefik
-          - /var/run/docker.sock:/var/run/docker.sock
-        ports:
-          - "80:80"
-        restart_policy: unless-stopped
-        networks:
-          - name: web
+    
+    # Deploy stack
+    - name: Copy docker-compose.yml
+      template:
+        src: docker-compose.yml.j2
+        dest: /opt/docker-compose.yml
 
-    # Install API
-    - name: Run API container
-      docker_container:
-        name: demo-api
-        image: "{{ api_image }}"
-        exposed_ports:
-          - 8080
-        restart_policy: unless-stopped
-        networks:
-          - name: web
+    - name: Deploy stack
+      docker_stack:
+        state: present
+        name: demo-ci-cd-api-stack
+        compose:
+          - /opt /docker-compose.yml
+  
 
