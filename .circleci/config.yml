@@ -13,20 +13,20 @@ jobs:
           name: Move into api directory
           command: cd api/
       - restore_cache:
-          key: v1-gradle-wrapper-{{ checksum  "gradle/wrapper/gradle-wrapper.properties" }}
+          key: v1-gradle-wrapper-{{ checksum  "api/gradle/wrapper/gradle-wrapper.properties" }}
       - restore_cache:
-          key: v1-gradle-cache-{{ checksum "build.gradle" }}
+          key: v1-gradle-cache-{{ checksum "api/build.gradle" }}
       - run:
           name: Run tests
           command: ./gradelw test
       - save_cache:
           paths:
             - ~/.gradle/wrapper
-          key: v1-gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+          key: v1-gradle-wrapper-{{ checksum "api/gradle/wrapper/gradle-wrapper.properties" }}
       - save_cache:
           paths:
             - ~/.gradle/caches
-          key: v1-gradle-cache-{{ checksum "build.gradle" }}
+          key: v1-gradle-cache-{{ checksum "api/build.gradle" }}
       - store_test_results:
           path: build/test-results/test
       - store_artifacts:
@@ -51,14 +51,14 @@ jobs:
           command: cd frontend/
       - restore_cache:
           keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
+            - yarn-packages-{{ checksum "frontend/yarn.lock" }}
       - run:
           name: Install dependencies and test
           command: yarn install --frozen-lockfile && yarn test
       - save_cache:
           paths:
             - ~/.cache/yarn
-          key: yarn-packages-{{ checksum "yarn.lock" }}
+          key: yarn-packages-{{ checksum "frontend/yarn.lock" }}
       - run:
           name: Production build
           command: yarn build
