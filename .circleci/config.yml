@@ -53,7 +53,7 @@ jobs:
             - yarn-packages-{{ checksum "frontend/yarn.lock" }}
       - run:
           name: Install dependencies and test
-          command: yarn install --frozen-lockfile && yarn test
+          command: ~/.yarn/bin/yarn install --frozen-lockfile && yarn test
           working_directory: frontend/
       - save_cache:
           paths:
@@ -61,7 +61,7 @@ jobs:
           key: yarn-packages-{{ checksum "frontend/yarn.lock" }}
       - run:
           name: Production build
-          command: yarn build
+          command: ~/.yarn/bin/yarn build
           working_directory: frontend/
       - persist_to_workspace:
           root: .
