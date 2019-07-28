@@ -38,8 +38,6 @@ jobs:
           working_directory: api/
 
   build_test_frontend:
-    # machine:
-    #   image: ubuntu-1604:201903-01
     docker:
       - image: circleci/node:10.1.0 
     environment:
@@ -47,9 +45,6 @@ jobs:
       IMAGE_NAME: "nick96/demo-api"
     steps:
       - checkout
-      # - run:
-      #     name: Install yarn
-      #     command: curl -o- -L https://yarnpkg.com/install.sh | bash
       - restore_cache:
           keys:
             - yarn-packages-{{ checksum "frontend/yarn.lock" }}
@@ -68,7 +63,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - .
+            - frontend
 
   deploy_api:
     docker:
@@ -90,20 +85,18 @@ jobs:
                  --extra-vars "api_image=$IMAGE_NAME email=$LETS_ENCRYPT_EMAIL ansible_python_interpreter=/usr/bin/python33"
 
   deploy_frontend:
-    # machine:
-    #   image: ubuntu-1604:201903-01
     docker:
       - image: circleci/node:10.1.0
     steps:
       - attach_workspace:
-          at: /tmp/workspace
+          at: /project
       - run:
           name: Install firebase-tools
           command: sudo npm install -g firebase-tools
       - run:
           name: Deploy frontend to firebase hosting
           command: sudo firebase deploy --token=$FIREBASE_TOKEN
-          working_directory: frontend
+          working_directory: /project/frontend
       
 workflows:
   version: 2
