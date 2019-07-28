@@ -38,22 +38,24 @@ jobs:
           working_directory: api/
 
   build_test_frontend:
-    machine:
-      image: ubuntu-1604:201903-01 
+    # machine:
+    #   image: ubuntu-1604:201903-01
+    docker:
+      - image: circleci/node:10.1.0 
     environment:
       CI: "1"
       IMAGE_NAME: "nick96/demo-api"
     steps:
       - checkout
-      - run:
-          name: Install yarn
-          command: curl -o- -L https://yarnpkg.com/install.sh | bash
+      # - run:
+      #     name: Install yarn
+      #     command: curl -o- -L https://yarnpkg.com/install.sh | bash
       - restore_cache:
           keys:
             - yarn-packages-{{ checksum "frontend/yarn.lock" }}
       - run:
           name: Install dependencies and test
-          command: ~/.yarn/bin/yarn install --frozen-lockfile && yarn test
+          command: yarn install --frozen-lockfile && yarn test
           working_directory: frontend/
       - save_cache:
           paths:
@@ -61,7 +63,7 @@ jobs:
           key: yarn-packages-{{ checksum "frontend/yarn.lock" }}
       - run:
           name: Production build
-          command: ~/.yarn/bin/yarn build
+          command: yarn build
           working_directory: frontend/
       - persist_to_workspace:
           root: .
@@ -88,8 +90,10 @@ jobs:
                  --extra-vars "api_image=$IMAGE_NAME email=$LETS_ENCRYPT_EMAIL ansible_python_interpreter=/usr/bin/python33"
 
   deploy_frontend:
-    machine:
-      image: ubuntu-1604:201903-01
+    # machine:
+    #   image: ubuntu-1604:201903-01
+    docker:
+      - image: circleci/node:10.1.0
     steps:
       - attach_workspace:
           at: /tmp/workspace
