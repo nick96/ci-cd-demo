@@ -10,7 +10,7 @@ provider "digitalocean" {
 }
 
 resource "digitalocean_ssh_key" "pipeline" {
-  name = "Azure pipeline"
+  name = "CircleCI pipeline"
   public_key = "${file("${var.PIPELINE_SSHKEY}")}"
 }
 
