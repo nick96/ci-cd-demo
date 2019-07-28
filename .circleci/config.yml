@@ -100,7 +100,7 @@ jobs:
                  -vvvv \
                  -i hosts \
                  -u root \
-                 --extra-vars "api_image=$IMAGE_NAME email=$LETS_ENCRYPT_EMAIL ansible_python_interpreter=/usr/bin/python33"
+                 --extra-vars "api_image=$IMAGE_NAME email=$LETS_ENCRYPT_EMAIL ansible_python_interpreter=/usr/bin/python3"
           working_directory: /tmp/workspace/playbook
 
 
