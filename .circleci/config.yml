@@ -91,7 +91,7 @@ jobs:
     machine:
       image: ubuntu-1604:201903-01
     steps:
-      - attached_to_workspace:
+      - attach_workspace:
           at: /tmp/workspace
       - run:
           name: Install firebase-tools
