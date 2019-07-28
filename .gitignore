@@ -2,3 +2,5 @@ api/terraform/terraform.tfvars
 api/playbook/azure_id_rsa
 api/playbook/azure_id_rsa.pub
 api/playbook/playbook.retry
+api/terraform/circleci_id_rsa.pub
+api/terraform/circleci_id_rsa
