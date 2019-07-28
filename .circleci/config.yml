@@ -9,9 +9,6 @@ jobs:
       IMAGE_NAME: "nick96/demo-api"
     steps:
       - checkout
-      - run:
-          name: Move into api directory
-          command: cd api/
       - restore_cache:
           key: v1-gradle-wrapper-{{ checksum  "api/gradle/wrapper/gradle-wrapper.properties" }}
       - restore_cache:
@@ -19,6 +16,7 @@ jobs:
       - run:
           name: Run tests
           command: ./gradlew test
+          working_directory: api/
       - save_cache:
           paths:
             - ~/.gradle/wrapper
@@ -37,6 +35,7 @@ jobs:
       - run:
           name: Build and push docker image
           command: ./gradlew jib --image "$IMAGE_NAME"
+          working_directory: api/
 
   build_test_frontend:
     machine:
@@ -46,15 +45,13 @@ jobs:
       IMAGE_NAME: "nick96/demo-api"
     steps:
       - checkout
-      - run:
-          name: Move into frontend directory
-          command: cd frontend/
       - restore_cache:
           keys:
             - yarn-packages-{{ checksum "frontend/yarn.lock" }}
       - run:
           name: Install dependencies and test
           command: yarn install --frozen-lockfile && yarn test
+          working_directory: frontend/
       - save_cache:
           paths:
             - ~/.cache/yarn
@@ -62,6 +59,7 @@ jobs:
       - run:
           name: Production build
           command: yarn build
+          working_directory: frontend/
       - persist_to_workspace:
           root: .
           paths:
