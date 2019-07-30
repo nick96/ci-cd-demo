@@ -101,7 +101,10 @@ jobs:
                  -v \
                  -i hosts \
                  -u root \
-                 --extra-vars "api_image=$IMAGE_NAME email=$LETS_ENCRYPT_EMAIL ansible_python_interpreter=/usr/bin/python3"
+                 -e "api_image=$IMAGE_NAME" \
+                 -e "letsencrypt_email=$LETS_ENCRYPT_EMAIL" \
+                 -e "ansible_python_interpreter=/usr/bin/python3" \
+                 -e "digitalocean_token=$DO_AUTH_TOKEN"
           working_directory: /tmp/workspace/playbook
 
 
