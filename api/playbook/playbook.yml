@@ -54,9 +54,11 @@
         - name: Get docker info
           shell: docker info --format "{{ '{{' }} .Swarm.LocalNodeState {{ '}}' }}"
           register: swarm_state
+        - debug:
+             var: swarm_state
         - name: Initialise docker swarm
           shell: docker swarm init --advertise-addr 127.0.0.1
-          when: swarm_state != "active"
+          when: swarm_state.stdout != "active"
 
     # Deploy
     - name: Deploy
