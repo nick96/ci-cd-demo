@@ -1,8 +1,17 @@
 logLevel = "DEBUG"
+defaultEntryPoints = ["http", "https"]
 
+[accessLog]
+
+# Enable the web ui and api
+[api]
+
+# Watch the config file for changes
 [file]
 watch = true
 
+
+# Configure http and https endpoints. Redirectory http to https
 [entryPoints]
   [entryPoints.http]
   address = ":80"
@@ -10,14 +19,24 @@ watch = true
     entryPoint = "https"
   [entryPoints.https]
   address = ":443"
+    [entryPoints.https.tls]
 
+# Configure letsencrypt to use the staging CA server with the DNS challnge
+# (digitalocean provider). Only provision a cert for demo.nspain.me
 [acme]
 email = "{{ letsencrypt_email }}"
-storageFile = "/etc/traefik/acme.json"
+storage = "/etc/traefik/acme.json"
 entryPoint = "https"
-caServer = "https://acme-staging.api.letsencrypt.org/directory"
-[acme.dnsChallenge]
-  provider = "digitalocean"
-  delayBeforeCheck = 0
-[[acme.domains]]
-   main = "demo.nspain.me"
+caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
+  [acme.dnsChallenge]
+    provider = "digitalocean"
+    delayBeforeCheck = 0
+  [[acme.domains]]
+    main = "demo.nspain.me"
+
+# Configure docker interaction.
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+exposedbydefault = true
+watch = true
+swarmmode = true
