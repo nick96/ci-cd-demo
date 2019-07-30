@@ -2,20 +2,21 @@ version: '3'
 
 networks:
   traefik:
+    driver: overlay
 
 services:
   api:
     image: {{ api_image }}
-    labels:
-      - traefik.frontend.rule=Host:demo.nspain.me
-      - traefik.docker.network=traefik
+    deploy:
+      labels:
+        - traefik.frontend.rule=Host:demo.nspain.me
+        - traefik.port=8080
+        - traefik.backend=api
+        - traefik.docker.network=traefik
     networks:
-      - internal
-      - web
-    expose:
-      - 8080
+      - traefik
   traefik:
-    image: traefik:{{ traefik_version }}
+    image: traefik:v1.7.12-alpine
     environment:
       DO_AUTH_TOKEN: {{ digitalocean_token }}
     ports:
@@ -24,3 +25,5 @@ services:
     volumes:
       - /etc/traefik:/etc/traefik
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - traefik
