@@ -27,7 +27,7 @@ watch = true
 email = "{{ letsencrypt_email }}"
 storage = "/etc/traefik/acme.json"
 entryPoint = "https"
-caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
+#caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
   [acme.dnsChallenge]
     provider = "digitalocean"
     delayBeforeCheck = 0
