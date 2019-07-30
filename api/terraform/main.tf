@@ -4,6 +4,11 @@ variable "PIPELINE_SSHKEY" {}
 
 variable "PERSONAL_SSHKEY" {}
 
+terraform {
+  required_version = "~> 0.12.0"
+  backend          "remote"         {}
+}
+
 provider "digitalocean" {
   token = "${var.DO_TOKEN}"
 }
