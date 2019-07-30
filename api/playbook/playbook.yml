@@ -6,58 +6,74 @@
 
   tasks:
 
-    # Install docker
-    - name: Install apt HTTPS prereqs
-      apt:
-        name: 
-          - apt-transport-https 
-          - ca-certificates 
-          - curl 
-          - software-properties-common
-          - python3-pip
-        update_cache: yes
-    - name: Add Docker GPG key
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
-    - name: Add Docker repository to apt sources
-      apt_repository:
-        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
-        state: present
-    - name: Install Docker
-      apt:
-        name: docker-ce
-        update_cache: yes
-    - name: Ensure the Docker service is running
-      service:
-        name: docker
-        state: started
-    - name: Ensure Python docker library is installed
-      pip:
-        name: docker
-        state: present
+    - name: Install docker
+      block:
+      - name: Install apt HTTPS prereqs
+        apt:
+          name: 
+            - apt-transport-https 
+            - ca-certificates 
+            - curl 
+            - software-properties-common
+            - python3-pip
+          update_cache: yes
+      - name: Add Docker GPG key
+        apt_key:
+          url: https://download.docker.com/linux/ubuntu/gpg
+          state: present
+      - name: Add Docker repository to apt sources
+        apt_repository:
+          repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+          state: present
+      - name: Install Docker
+        apt:
+          name: docker-ce
+          update_cache: yes
+      - name: Ensure the Docker service is running
+        service:
+          name: docker
+          state: started
+      - name: Ensure Python docker library is installed
+        pip:
+          name: docker
+          state: present
     
-    # Setup traefik config
-    - name: Create traefik directory
-      file:
-        path: /etc/traefik
-        state: directory
-    - name: Copy traefik config
-      template:
-        src: traefik.toml.j2
-        dest: /etc/traefik/traefik.toml
-    
-    # Deploy stack
-    - name: Copy docker-compose.yml
-      template:
-        src: docker-compose.yml.j2
-        dest: /opt/docker-compose.yml
+    - name: Setup traefik
+      block:
+        - name: Create traefik directory
+          file:
+            path: /etc/traefik
+            state: directory
+        - name: Copy traefik config
+          template:
+            src: traefik.toml.j2
+            dest: /etc/traefik/traefik.toml
 
-    - name: Deploy stack
-      docker_stack:
-        state: present
-        name: demo-ci-cd-api-stack
-        compose:
-          - /opt /docker-compose.yml
-  
+    - name: Setup docker swarm
+      block:
+        - name: Get docker info
+          shell: docker info --format "{{ '{{' }} .Swarm.LocalNodeState {{ '}}' }}"
+          register: swarm_state
+        - name: Initialise docker swarm
+          shell: docker swarm init --advertise-addr 127.0.0.1
+          when: swarm_state != "active"
 
+    # Deploy
+    - name: Deploy
+      block:
+        - name: Copy docker-compose.yml
+          template:
+            src: docker-compose.yml.j2
+            dest: /opt/docker-compose.yml
+        - name: Install python library requirements
+          pip:
+            name:
+              - jsondiff
+              - pyyaml
+        - name: Deploy stack
+          docker_stack: 
+            state: present
+            prune: yes
+            name: demo_ci_cd
+            compose:
+              - /opt/docker-compose.yml
