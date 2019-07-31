@@ -119,11 +119,6 @@ jobs:
           command: ssh-add -L > id_rsa.pub
           working_directory: /tmp/workspace/terraform
       - run:
-          name: Print debug
-          command: |
-            echo "TF_VAR_DO_TOKEN = $TF_VAR_DO_TOKEN"
-            echo "TF_VAR_PIPELINE_SSHKEY = $TF_VAR_PIPELINE_SSHKEY"
-      - run:
           name: Initialise terraform
           command: terraform init -backend-config=backend.hcl
           working_directory: /tmp/workspace/terraform
