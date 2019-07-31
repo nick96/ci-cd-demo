@@ -108,9 +108,6 @@ jobs:
   deploy_infra:
     docker:
       - image: hashicorp/terraform:0.12.5
-    environment:
-      TF_VAR_DO_TOKEN: $DO_TERRAFORM_AUTH_TOKEN
-      TF_VAR_PIPELINE_SSHKEY: id_rsa.pub
     steps:
       - attach_workspace:
           at: /tmp/workspace
@@ -136,7 +133,11 @@ jobs:
           working_directory: /tmp/workspace/terraform
       - run:
           name: Apply terraform deployment
-          command: terraform apply -auto-approve
+          command: |
+            terraform apply \
+              -auto-approve \
+              -var "DO_TOKEN=$DO_TERRAFORM_AUTH_TOKEN" \
+              -var "PIPELINE_SSHKEY=id_rsa.pub"
           working_directory: /tmp/workspace/terraform
 
   deploy_api:
