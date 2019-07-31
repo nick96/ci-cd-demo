@@ -131,7 +131,7 @@ jobs:
           working_directory: /tmp/workspace/terraform
       - run:
           name: Apply terraform deployment
-          command: terraform apply
+          command: terraform apply -auto-approve
           working_directory: /tmp/workspace/terraform
 
   deploy_api:
