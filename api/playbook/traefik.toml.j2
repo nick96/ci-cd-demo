@@ -34,7 +34,7 @@ caServer = "{{ traefik_ca_server | default('https://acme-v02.api.letsencrypt.org
     provider = "{{ traefik_dns_provider | default('digitalocean') }}"
     delayBeforeCheck = 0
   [[acme.domains]]
-    main = "demo.nspain.me"
+    main = "*.nspain.me"
 
 # Configure docker interaction.
 [docker]
