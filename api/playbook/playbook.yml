@@ -84,3 +84,9 @@
             name: demo_ci_cd
             compose:
               - /opt/docker-compose.yml
+  post_tasks:
+    - name: 
+      uri:
+        url: https://demo.nspain.me
+        methd: HEAD
+      delegate_to: localhost
