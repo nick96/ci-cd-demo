@@ -4,7 +4,7 @@ variable "PIPELINE_SSHKEY" {}
 
 terraform {
   required_version = "~> 0.12.0"
-  backend          "remote"         {}
+  backend "remote" {}
 }
 
 provider "digitalocean" {
@@ -21,7 +21,7 @@ resource "digitalocean_droplet" "api" {
   name     = "api-1"
   region   = "sgp1"
   size     = "s-1vcpu-1gb"
-  ssh_keys = ["${digitalocean_ssh_key.pipeline.fingerprint}", "${digitalocean_ssh_key.personal.fingerprint}"]
+  ssh_keys = ["${digitalocean_ssh_key.pipeline.fingerprint}"]
 }
 
 resource "digitalocean_domain" "domain" {
@@ -32,7 +32,7 @@ resource "digitalocean_record" "www_api" {
   domain = "${digitalocean_domain.domain.name}"
   type   = "A"
   name   = "demo"
-  value  = "${digitalocean_droplet.api.ipv4_address }"
+  value  = "${digitalocean_droplet.api.ipv4_address}"
 }
 
 output "fqdn" {
