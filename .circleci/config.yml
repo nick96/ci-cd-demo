@@ -304,27 +304,29 @@ workflows:
           requires:
             - setup
 
-      # Build (frontend, api)
-      - build_frontend:
-          requires:
-            - lint_frontend
-      - build_api:
-          requires:
-            - lint_api
+     
 
       # Test (frontend, api, ansible, terraform)
       - test_frontend:
           requires:
-            - build_frontend
+            - lint_frontend
       - test_api:
           requires:
-            - build_api
+            - lint_api
       - test_playbook:
           requires:
             - lint_playbook
       - test_terraform:
           requires:
             - lint_terraform
+
+      # Build for production (frontend, api)
+      - build_frontend:
+          requires:
+            - test_frontend
+      - build_api:
+          requires:
+            - test_api
 
       # Deploy infrasture before everything else so we have something to use
       - deploy_terraform:
