@@ -110,13 +110,17 @@ jobs:
       - image: hashicorp/terraform:0.12.5
     environment:
       TF_VAR_DO_TOKEN: $DO_TERRAFORM_AUTH_TOKEN
-      TF_VAR_PIPELINE_SSHKEY: ~/.ssh/id_rsa_pub
+      TF_VAR_PIPELINE_SSHKEY: id_rsa.pub
     steps:
       - attach_workspace:
           at: /tmp/workspace
       - run: 
           name: Create CLI config file
           command: echo $TERRAFORM_CLI_CONFIG >~/.terraformrc
+      - run:
+          name: Create file with public key in known location
+          command: ssh-add -L > id_rsa.pub
+          working_directory: /tmp/workspace/terraform
       - run:
           name: Initialise terraform
           command: terraform init -backend-config=backend.hcl
