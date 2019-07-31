@@ -128,18 +128,17 @@ jobs:
           command: terraform init -backend-config=backend.hcl
           working_directory: /tmp/workspace/terraform
       - run:
+          name: Create tf variables file
+          command: |
+            echo "DO_TOKEN='$DO_TERRAFORM_AUTH_TOKEN'" >terraform.tfvars
+            echo "PIPELINE_SSHKEY='id_rsa.pub'" >>terraform.tfvars
+      - run:
           name: Plan terraform deployment
-          command: terraform plan \
-            -var "DO_TOKEN=$DO_TERRAFORM_AUTH_TOKEN" \
-            -var "PIPELINE_SSHKEY=id_rsa.pub"
+          command: terraform plan
           working_directory: /tmp/workspace/terraform
       - run:
           name: Apply terraform deployment
-          command: |
-            terraform apply \
-              -auto-approve \
-              -var "DO_TOKEN=$DO_TERRAFORM_AUTH_TOKEN" \
-              -var "PIPELINE_SSHKEY=id_rsa.pub"
+          command: terraform apply -auto-approve
           working_directory: /tmp/workspace/terraform
 
   deploy_api:
