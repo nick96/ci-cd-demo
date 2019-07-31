@@ -43,6 +43,10 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace/
       - run:
+          name: Initialise
+          command: terraform init
+          working_directory: /tmp/workspace/api/terraform
+      - run:
           name: Validation
           command: terraform validate
           working_directory: /tmp/workspace/api/terraform
