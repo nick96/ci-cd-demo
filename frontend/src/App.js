@@ -2,6 +2,8 @@ import "./App.css";
 
 import React from "react";
 
+const REST_URI_BASE = process.env.REACT_APP_REST_URI_BASE;
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -18,7 +20,7 @@ class App extends React.Component {
 
   onSubmit = event => {
     event.preventDefault();
-    let url = "http://localhost:8000/conversion?";
+    let url = `${REST_URI_BASE}:8000/conversion?`;
     switch (this.state.conversion) {
       case "toKg": {
         url += `from=lb&to=kg&value=${this.state.value}`;
