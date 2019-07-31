@@ -55,6 +55,7 @@ jobs:
     environment:
       CI: "1"
       IMAGE_NAME: "nick96/demo-api"
+      REACT_APP_REST_URI_BASE: "https://demo.nspain.me"
     steps:
       - checkout
       - restore_cache:
