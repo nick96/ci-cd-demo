@@ -119,7 +119,7 @@ jobs:
           command: echo $TERRAFORM_CLI_CONFIG >~/.terraformrc
       - run:
           name: Initialise terraform
-          command: terraform init
+          command: terraform init -backend-config=backend.hcl
           working_directory: /tmp/workspace/terraform
       - run:
           name: Plan terraform deployment
@@ -127,7 +127,7 @@ jobs:
           working_directory: /tmp/workspace/terraform
       - run:
           name: Apply terraform deployment
-          command: terraform apply -backend-config=backend.hcl
+          command: terraform apply
           working_directory: /tmp/workspace/terraform
 
   deploy_api:
