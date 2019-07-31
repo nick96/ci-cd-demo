@@ -6,3 +6,4 @@ api/terraform/circleci_id_rsa.pub
 api/terraform/circleci_id_rsa
 frontend/.env
 api/terraform/config.hcl
+circle.yml
