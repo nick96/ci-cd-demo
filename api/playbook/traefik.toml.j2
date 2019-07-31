@@ -29,8 +29,9 @@ storage = "/etc/traefik/acme.json"
 entryPoint = "https"
 #caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
 caServer = "https://acme-v02.api.letsencrypt.org/directory"
+caServer = "{{ traefik_ca_server | default('https://acme-v02.api.letsencrypt.org/directory') }}"
   [acme.dnsChallenge]
-    provider = "digitalocean"
+    provider = "{{ traefik_dns_provider | default('digitalocean') }}"
     delayBeforeCheck = 0
   [[acme.domains]]
     main = "demo.nspain.me"
