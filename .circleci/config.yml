@@ -129,7 +129,9 @@ jobs:
           working_directory: /tmp/workspace/terraform
       - run:
           name: Plan terraform deployment
-          command: terraform plan
+          command: terraform plan \
+            -var "DO_TOKEN=$DO_TERRAFORM_AUTH_TOKEN" \
+            -var "PIPELINE_SSHKEY=id_rsa.pub"
           working_directory: /tmp/workspace/terraform
       - run:
           name: Apply terraform deployment
