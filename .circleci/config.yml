@@ -1,5 +1,37 @@
 version: 2.1
 jobs:
+  test_terraform:
+    docker:
+      - image: golang:1.12.6
+    steps:
+      - checkout
+      - run:
+          name: Run terratest tests
+          command: echo 'TODO'
+          working_directory: api/terraform
+      - persist_to_workspace:
+          root: api
+          paths:
+            - terraform
+
+  test_playbook:
+    machine:
+      image: ubuntu-1604:201903-01 
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: echo 'TODO'
+          working_directory: api/playbook
+      - run: 
+          name: Run molecule tests
+          command: echo 'TODO'
+          working_directory: api/playbook
+      - persist_to_workspace:
+          root: api
+          paths:
+            - playbook
+
   build_test_api:
     docker:
       - image: circleci/openjdk:11.0.3-jdk-stretch
@@ -43,11 +75,6 @@ jobs:
             echo "$DOCKERHUB_PSW" | docker login --username "$DOCKERHUB_USR" --password-stdin
             docker push "${IMAGE_NAME}:latest"
             docker push "${IMAGE_NAME}:${CIRCLE_SHA1}"
-      - run: ls -R
-      - persist_to_workspace:
-          root: api
-          paths:
-            - playbook
 
   build_test_frontend:
     docker:
@@ -77,6 +104,28 @@ jobs:
           root: .
           paths:
             - frontend
+
+  deploy_infra:
+    docker:
+      - image: hashicorp/terraform:0.12.5
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: 
+          name: Create CLI config file
+          command: echo $TERRAFORM_CLI_CONFIG >~/.terraformrc
+      - run:
+          name: Initialise terraform
+          command: terraform init
+          working_directory: /tmp/workspace/terraform
+      - run:
+          name: Plan terraform deployment
+          command: terraform plan
+          working_directory: /tmp/workspace/terraform
+      - run:
+          name: Apply terraform deployment
+          command: terraform apply -backend-config=backend.hcl
+          working_directory: /tmp/workspace/terraform
 
   deploy_api:
     docker:
@@ -128,10 +177,21 @@ workflows:
   build_test_deploy:
     jobs:
       - build_test_api
-      - build_test_frontend
+      - test_terraform
+      - test_playbook
+      - deploy_infra:
+          requires:
+            - build_test_api
+            - test_terraform
+            - test_playbook
       - deploy_api:
           requires: 
-            - build_test_api
+            - deploy_infra
+
+      - build_test_frontend
       - deploy_frontend:
           requires:
             - build_test_frontend
+            # Frontend deployment is dependent on the API deployment because we
+            # don't want the frontend ahead of the API.
+            - deploy_api
