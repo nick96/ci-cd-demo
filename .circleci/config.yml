@@ -127,6 +127,7 @@ jobs:
           command: |
             echo "DO_TOKEN='$DO_TERRAFORM_AUTH_TOKEN'" >terraform.tfvars
             echo "PIPELINE_SSHKEY='id_rsa.pub'" >>terraform.tfvars
+          working_directory: /tmp/workspace/terraform
       - run:
           name: Plan terraform deployment
           command: terraform plan
