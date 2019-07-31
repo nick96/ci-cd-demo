@@ -5,12 +5,24 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 open class DemoApplication
 
 fun main(args: Array<String>) {
 	runApplication<DemoApplication>(*args)
+}
+
+@Configuration
+@EnableWebMvc
+public class WebConfig: WebMvcConfigurer {
+	override fun addCorsMappings(registry: CorsRegistry) {
+		registry.addMapping("/**");
+	}
 }
 
 @RestController
