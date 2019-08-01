@@ -20,7 +20,7 @@ class App extends React.Component {
 
   onSubmit = event => {
     event.preventDefault();
-    let url = `${REST_URI_BASE}:8000/conversion?`;
+    let url = `${REST_URI_BASE}/conversion?`;
     switch (this.state.conversion) {
       case "toKg": {
         url += `from=lb&to=kg&value=${this.state.value}`;
