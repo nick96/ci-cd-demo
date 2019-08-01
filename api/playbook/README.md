@@ -10,3 +10,5 @@ docker containers.
 - `letsencrypt_email`: Email to use for Traefik's let's encrpyt
 - `digitalocean_token`: Token for the digital ocean API, allows us to perform
   the DNS challenge
+- `logly_token`: Customer token to identify us to logly
+- `logly_domain`: Domain to send logs to

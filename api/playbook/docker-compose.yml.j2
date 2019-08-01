@@ -3,6 +3,7 @@ version: '3'
 networks:
   traefik:
     external: true
+  logging:
 
 services:
   api:
@@ -27,3 +28,17 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - traefik
+  
+  logging:
+    image: gliderlabs/logspout:v3.2.6
+    networks:
+      - logging
+    volumes:
+      - /etc/hostname:/etc/host_hostname:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      mode: global
+    environment:
+      SYSLOG_STRUCTURED_DATA: "{{ loggly_token }}@41058"
+      tag: ci-cd-demo
+    command: "syslog+tcp://{{ logly_domain }}:514"

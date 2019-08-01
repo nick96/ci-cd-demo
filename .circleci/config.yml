@@ -168,7 +168,9 @@ jobs:
                  -e "api_image=$IMAGE_NAME" \
                  -e "letsencrypt_email=$LETS_ENCRYPT_EMAIL" \
                  -e "ansible_python_interpreter=/usr/bin/python3" \
-                 -e "digitalocean_token=$DO_DNS_AUTH_TOKEN"
+                 -e "digitalocean_token=$DO_DNS_AUTH_TOKEN" \
+                 -e "logly_token=$LOGLY_TOKEN" \
+                 -e "logly_domain=$LOGLY_DOMAIN"
           working_directory: /tmp/workspace/playbook
 
 
