@@ -41,4 +41,4 @@ services:
     environment:
       SYSLOG_STRUCTURED_DATA: "{{ loggly_token }}@41058"
       tag: ci-cd-demo
-    command: "syslog+tcp://{{ logly_domain }}:514"
+    command: "syslog+tcp://{{ loggly_domain }}:514"
