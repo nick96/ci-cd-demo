@@ -1,95 +1,38 @@
 version: 2.1
-
 jobs:
-  setup:
+  test_terraform:
+    docker:
+      - image: golang:1.12.6
+    steps:
+      - checkout
+      - run:
+          name: Run terratest tests
+          command: echo 'TODO'
+          working_directory: api/terraform
+      - persist_to_workspace:
+          root: api
+          paths:
+            - terraform
+
+  test_playbook:
     machine:
       image: ubuntu-1604:201903-01 
     steps:
       - checkout
+      - run:
+          name: Install dependencies
+          command: echo 'TODO'
+          working_directory: api/playbook
+      - run: 
+          name: Run molecule tests
+          command: echo 'TODO'
+          working_directory: api/playbook
       - persist_to_workspace:
-          root: .
+          root: api
           paths:
-            - api
-            - frontend
-  
-  lint_frontend:
-    docker:
-      - image: circleci/node:10.1.0
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace/
-      - run:
-          name: Prettier
-          command: yarn prettier
-          working_directory: /tmp/workspace/frontend
-      - run:
-          name: ESLint
-          command: yarn lint
-          working_directory: /tmp/workspace/frontend
-  lint_api:
-    docker:
-      - image: circleci/openjdk:11.0.3-jdk-stretch
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace/
-      - run:
-          name: ktlint
-          command: ./gradlew ktlint
-          working_directory: /tmp/workspace/api
-  lint_terraform:
-    docker:
-      - image: hashicorp/terraform:0.12.5
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace/
-      - run:
-          name: Initialise
-          command: terraform init
-          working_directory: /tmp/workspace/api/terraform
-      - run:
-          name: Validation
-          command: terraform validate
-          working_directory: /tmp/workspace/api/terraform
-      - run:
-          name: Formatting
-          command: terraform fmt -check
-          working_directory: /tmp/workspace/api/terraform
-  lint_playbook:
-    docker:
-      - image: circleci/python:3.6.4
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace/
-      - run:
-          name: Install ansible lint
-          command: pip install ansible-lint==4.1.0
-      - run:
-          name: Lint
-          command: ansible-lint playbook.yml
-          working_directory: /tmp/workspace/api/playbook
+            - playbook
 
-  build_frontend:
-    docker:
-      - image: circleci/node:10.1.0 
-    environment:
-      REACT_APP_REST_URI_BASE: "https://demo.nspain.me"
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace/
-      - restore_cache:
-          keys:
-            - yarn-packages-{{ checksum "/tmp/workspace/frontend/yarn.lock" }}
-      - run:
-          name: Install dependencies and test
-          command: |
-            yarn install --frozen-lockfile
-            yarn build
-          working_directory: frontend/
-      - save_cache:
-          paths:
-            - ~/.cache/yarn
-          key: yarn-packages-{{ checksum "/tmp/workspace/frontend/yarn.lock" }}
-  build_api:
+  build_test_api:
     docker:
       - image: circleci/openjdk:11.0.3-jdk-stretch
     environment:
@@ -97,8 +40,27 @@ jobs:
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
       IMAGE_NAME: "nick96/demo-api"
     steps:
-      - attach_workspace:
-          at: /tmp/workspace/
+      - checkout
+      - restore_cache:
+          key: v1-gradle-wrapper-{{ checksum  "api/gradle/wrapper/gradle-wrapper.properties" }}
+      - restore_cache:
+          key: v1-gradle-cache-{{ checksum "api/build.gradle" }}
+      - run:
+          name: Run tests
+          command: ./gradlew test
+          working_directory: api/
+      - save_cache:
+          paths:
+            - ~/.gradle/wrapper
+          key: v1-gradle-wrapper-{{ checksum "api/gradle/wrapper/gradle-wrapper.properties" }}
+      - save_cache:
+          paths:
+            - ~/.gradle/caches
+          key: v1-gradle-cache-{{ checksum "api/build.gradle" }}
+      - store_test_results:
+          path: api/build/test-results/test
+      - store_artifacts:
+          path: api/build/test-results/test
       - setup_remote_docker
       - run:
           name: Build docker image
@@ -113,89 +75,42 @@ jobs:
             echo "$DOCKERHUB_PSW" | docker login --username "$DOCKERHUB_USR" --password-stdin
             docker push "${IMAGE_NAME}:latest"
             docker push "${IMAGE_NAME}:${CIRCLE_SHA1}"
-  
-  test_terraform:
-    docker:
-      - image: golang:1.12.6
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace/
-      - run:
-          name: Run terratest tests
-          command: echo 'TODO'
-          working_directory: /tmp/workspace/api/terraform
-  test_playbook:
-    machine:
-      image: ubuntu-1604:201903-01 
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace/
-      - run:
-          name: Install dependencies
-          command: echo 'TODO'
-          working_directory: /tmp/workspace/api/playbook
-      - run: 
-          name: Run molecule tests
-          command: echo 'TODO'
-          working_directory: /tmp/workspace/api/playbook
-  test_api:
-    docker:
-      - image: circleci/openjdk:11.0.3-jdk-stretch
-    environment:
-      _JAVA_OPTIONS: "-Xmx3g"
-      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
-      IMAGE_NAME: "nick96/demo-api"
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace/
-      - restore_cache:
-          key: v1-gradle-wrapper-{{ checksum  "/tmp/workspace/api/gradle/wrapper/gradle-wrapper.properties" }}
-      - restore_cache:
-          key: v1-gradle-cache-{{ checksum "/tmp/workspace/api/build.gradle" }}
-      - run:
-          name: Run tests
-          command: ./gradlew test
-          working_directory: api/
-      - save_cache:
-          paths:
-            - ~/.gradle/wrapper
-          key: v1-gradle-wrapper-{{ checksum "/tmp/workspace/api/gradle/wrapper/gradle-wrapper.properties" }}
-      - save_cache:
-          paths:
-            - ~/.gradle/caches
-          key: v1-gradle-cache-{{ checksum "/tmp/workspace/api/build.gradle" }}
-      - store_test_results:
-          path: api/build/test-results/test
-      - store_artifacts:
-          path: api/build/test-results/test
-  test_frontend:
+
+  build_test_frontend:
     docker:
       - image: circleci/node:10.1.0 
     environment:
       CI: "1"
-      REACT_APP_REST_URI_BASE: "http://localhost:8080"
+      IMAGE_NAME: "nick96/demo-api"
+      REACT_APP_REST_URI_BASE: "https://demo.nspain.me"
     steps:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-{{ checksum "/tmp/workspace/frontend/yarn.lock" }}
+            - yarn-packages-{{ checksum "frontend/yarn.lock" }}
       - run:
           name: Install dependencies and test
-          command: |
-            yarn install --frozen-lockfile
-            yarn test
-          working_directory: /tmp/workspace/frontend/
+          command: yarn install --frozen-lockfile && yarn test
+          working_directory: frontend/
       - save_cache:
           paths:
             - ~/.cache/yarn
-          key: yarn-packages-{{ checksum "/tmp/workspace/frontend/yarn.lock" }}
+          key: yarn-packages-{{ checksum "frontend/yarn.lock" }}
+      - run:
+          name: Production build
+          command: yarn build
+          working_directory: frontend/
+      - persist_to_workspace:
+          root: .
+          paths:
+            - frontend
 
-  deploy_terraform:
+  deploy_infra:
     docker:
       - image: hashicorp/terraform:0.12.5
     steps:
       - attach_workspace:
-          at: /tmp/workspace/
+          at: /tmp/workspace
       - run: 
           name: Create CLI config file
           command: echo $TERRAFORM_CLI_CONFIG >~/.terraformrc
@@ -221,6 +136,7 @@ jobs:
           name: Apply terraform deployment
           command: terraform apply -auto-approve
           working_directory: /tmp/workspace/terraform
+
   deploy_api:
     docker:
       - image: circleci/python:3.6.4
@@ -229,7 +145,7 @@ jobs:
       IMAGE_NAME: "nick96/demo-api"
     steps:
       - attach_workspace:
-          at: /tmp/workspace/
+          at: /tmp/workspace
       - run:
           name: Install ansible
           command: |
@@ -250,12 +166,14 @@ jobs:
                  -e "ansible_python_interpreter=/usr/bin/python3" \
                  -e "digitalocean_token=$DO_DNS_AUTH_TOKEN"
           working_directory: /tmp/workspace/playbook
+
+
   deploy_frontend:
     docker:
       - image: circleci/node:10.1.0
     steps:
       - attach_workspace:
-          at: /tmp/workspace/
+          at: /tmp/workspace
       - run:
           name: Install firebase-tools
           command: sudo npm install -g firebase-tools
@@ -264,103 +182,28 @@ jobs:
           command: sudo firebase deploy --project $FIREBASE_PROJECT --token=$FIREBASE_TOKEN
           working_directory: /tmp/workspace/frontend
       
-  smoke_test_api:
-    machine:
-      image: ubuntu-1604:201903-01
-    steps:
-      - run:
-          name: Check domain accessible
-          command: echo 'TODO'
-      - run:
-          name: Check expected response
-          command: echo 'TODO'
-  smoke_test_frontend:
-    machine:
-      image: ubuntu-1604:201903-01
-    steps:
-      - run:
-          name: Check accessible
-          command: echo 'TODO'
-  
-  smoke_test_e2e:
-    machine:
-      image: ubuntu-1604:201903-01
-    steps:
-      - run:
-          name: Check expected response on form submission
-          command: echo 'TODO'
-      
 workflows:
   version: 2
   build_test_deploy:
     jobs:
-      - setup
+      # Build / test
+      - test_terraform
+      - test_playbook
+      - build_test_api
+      - build_test_frontend
 
-      # Lint (frontend, api, ansible, terraform)
-      - lint_frontend:
+      # Deploy
+      - deploy_infra:
           requires:
-            - setup
-      - lint_api:
-          requires:
-            - setup
-      - lint_terraform:
-          requires:
-            - setup
-      - lint_playbook:
-          requires:
-            - setup
-
-     
-
-      # Test (frontend, api, ansible, terraform)
-      - test_frontend:
-          requires:
-            - lint_frontend
-      - test_api:
-          requires:
-            - lint_api
-      - test_playbook:
-          requires:
-            - lint_playbook
-      - test_terraform:
-          requires:
-            - lint_terraform
-
-      # Build for production (frontend, api)
-      - build_frontend:
-          requires:
-            - test_frontend
-      - build_api:
-          requires:
-            - test_api
-
-      # Deploy infrasture before everything else so we have something to use
-      - deploy_terraform:
-          requires:
-            - test_frontend
-            - test_api
+            - build_test_api
             - test_terraform
             - test_playbook
-
-      # Deploy API first so the frontend is never ahead
       - deploy_api:
-          requires:
-            - deploy_terraform
-
-      # Deploy frontend
+          requires: 
+            - deploy_infra
       - deploy_frontend:
           requires:
+            - build_test_frontend
+            # Frontend deployment is dependent on the API deployment because we
+            # don't want the frontend ahead of the API.
             - deploy_api
-
-     # Smoke tests
-      - smoke_test_api:
-          requires:
-            - deploy_api
-      - smoke_test_frontend:
-          requires:
-            - deploy_frontend
-      - smoke_test_e2e:
-          requires:
-            - smoke_test_api
-            - smoke_test_frontend
-      
