@@ -19,7 +19,7 @@ fun main(args: Array<String>) {
 
 @Configuration
 @EnableWebMvc
-public class WebConfig: WebMvcConfigurer {
+open class WebConfig: WebMvcConfigurer {
 	override fun addCorsMappings(registry: CorsRegistry) {
 		registry.addMapping("/**");
 	}
@@ -27,7 +27,6 @@ public class WebConfig: WebMvcConfigurer {
 
 @RestController
 @RequestMapping("/conversion")
-@CrossOrigin(origins = ["*"])
 class ConversionController {
 
 	val conversions = listOf("lb", "kg")
