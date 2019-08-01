@@ -46,6 +46,10 @@ jobs:
       - restore_cache:
           key: v1-gradle-cache-{{ checksum "api/build.gradle" }}
       - run:
+          name: Run linter
+          command: ./gradlew ktlint
+          working_directory: api/
+      - run:
           name: Run tests
           command: ./gradlew test
           working_directory: api/
