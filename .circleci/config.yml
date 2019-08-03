@@ -16,14 +16,14 @@ jobs:
 
   test_playbook:
     machine:
-      image: ubuntu-1604:201903-01 
+      image: ubuntu-1604:201903-01
     steps:
       - checkout
       - run:
           name: Install dependencies
           command: echo 'TODO'
           working_directory: api/playbook
-      - run: 
+      - run:
           name: Run molecule tests
           command: echo 'TODO'
           working_directory: api/playbook
@@ -72,7 +72,7 @@ jobs:
           working_directory: api/
       - run:
           name: Tag docker image
-          command: docker tag "${IMAGE_NAME}:latest" "${IMAGE_NAME}:${CIRCLE_SHA1}" 
+          command: docker tag "${IMAGE_NAME}:latest" "${IMAGE_NAME}:${CIRCLE_SHA1}"
       - run:
           name: Push docker image
           command: |
@@ -82,7 +82,7 @@ jobs:
 
   build_test_frontend:
     docker:
-      - image: circleci/node:10.1.0 
+      - image: circleci/node:10.1.0
     environment:
       CI: "1"
       IMAGE_NAME: "nick96/demo-api"
@@ -115,7 +115,7 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: 
+      - run:
           name: Create CLI config file
           command: echo $TERRAFORM_CLI_CONFIG >~/.terraformrc
       - run:
@@ -153,7 +153,7 @@ jobs:
       - run:
           name: Install ansible
           command: |
-            sudo pip install --upgrade pip 
+            sudo pip install --upgrade pip
             sudo pip install ansible==2.8.3
       - add_ssh_keys:
           fingerprints:
@@ -187,7 +187,7 @@ jobs:
           name: Deploy frontend to firebase hosting
           command: sudo firebase deploy --project $FIREBASE_PROJECT --token=$FIREBASE_TOKEN
           working_directory: /tmp/workspace/frontend
-      
+
 workflows:
   version: 2
   build_test_deploy:
@@ -205,7 +205,7 @@ workflows:
             - test_terraform
             - test_playbook
       - deploy_api:
-          requires: 
+          requires:
             - deploy_infra
       - deploy_frontend:
           requires:
