@@ -73,7 +73,7 @@ jobs:
                 -Pjib.to.image="$IMAGE_NAME" \
                 -Pjib.to.auth.username="$DOCKERHUB_USR" \
                 -Pjib.to.auth.password="$DOCKERHUB_PSW" \
-                -Pjib.to.tags=latest, "$CIRCLE_SHA1"
+                -Pjib.to.tags=latest,"$CIRCLE_SHA1"
           working_directory: api/
 
   build_test_frontend:
