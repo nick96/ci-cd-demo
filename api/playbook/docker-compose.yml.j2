@@ -17,6 +17,8 @@ services:
     networks:
       - traefik
       - logging
+    logging:
+      driver: syslog
 
   traefik:
     image: traefik:v1.7.12-alpine
@@ -31,12 +33,15 @@ services:
     networks:
       - traefik
       - logging
+    logging:
+      driver: syslog
 
   logging:
     image: gliderlabs/logspout:v3.2.6
     networks:
       - logging
     volumes:
+      - /etc/hostname:/etc/hostname:ro
       - /var/run/docker.sock:/var/run/docker.sock
     deploy:
       mode: global
