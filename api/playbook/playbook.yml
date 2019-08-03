@@ -10,10 +10,10 @@
       block:
       - name: Install apt HTTPS prereqs
         apt:
-          name: 
-            - apt-transport-https 
-            - ca-certificates 
-            - curl 
+          name:
+            - apt-transport-https
+            - ca-certificates
+            - curl
             - software-properties-common
             - python3-pip
           update_cache: yes
@@ -37,7 +37,7 @@
         pip:
           name: docker
           state: present
-    
+
     - name: Setup traefik
       block:
         - name: Create traefik directory
@@ -54,8 +54,6 @@
         - name: Get docker info
           shell: docker info --format "{{ '{{' }} .Swarm.LocalNodeState {{ '}}' }}"
           register: swarm_state
-        - debug:
-             var: swarm_state
         - name: Initialise docker swarm
           shell: docker swarm init --advertise-addr 127.0.0.1
           when: swarm_state.stdout != "active"
@@ -78,7 +76,7 @@
             driver: overlay
             scope: swarm
         - name: Deploy stack
-          docker_stack: 
+          docker_stack:
             state: present
             prune: yes
             name: demo_ci_cd
