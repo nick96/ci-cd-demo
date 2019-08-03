@@ -70,10 +70,10 @@ jobs:
           name: Build docker image
           command: |
             ./gradlew jib \
-                -Pjib.to.image="$IMAGE_NAME" \
-                -Pjib.to.auth.username="$DOCKERHUB_USR" \
-                -Pjib.to.auth.password="$DOCKERHUB_PSW" \
-                -Pjib.to.tags=latest,"$CIRCLE_SHA1"
+                -Djib.to.image="$IMAGE_NAME" \
+                -Djib.to.auth.username="$DOCKERHUB_USR" \
+                -Djib.to.auth.password="$DOCKERHUB_PSW" \
+                -Djib.to.tags=latest,"$CIRCLE_SHA1"
           working_directory: api/
 
   build_test_frontend:
